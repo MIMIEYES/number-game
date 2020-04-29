@@ -29,14 +29,12 @@ import io.nuls.contract.sdk.Event;
  * @author: PierreLuo
  * @date: 2020-04-07
  */
-public class CreateGameEvent implements Event {
+public class InitialGameEvent implements Event {
     private long id;
-    private long startHeight;
-    private int gameLotteryDelay;
+    private long endHeight;
 
-    public CreateGameEvent(long id, long startHeight, int gameLotteryDelay) {
+    public InitialGameEvent(long id, long endHeight) {
         this.id = id;
-        this.startHeight = startHeight;
-        this.gameLotteryDelay = gameLotteryDelay;
+        this.endHeight = endHeight;
     }
 }

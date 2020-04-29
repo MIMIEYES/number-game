@@ -32,4 +32,11 @@ import java.math.BigInteger;
 public class Constant {
     public static final BigInteger MIN_AMOUNT = BigInteger.valueOf(201000000L);
     public static final BigInteger PARTICIPANTS_AMOUNT = BigInteger.valueOf(200000000L);
+    public static final BigInteger NULS_10 = BigInteger.valueOf(1000000000L);
+    public static final BigInteger NULS_18 = BigInteger.valueOf(1800000000L);
+    public static final BigInteger NULS_50 = BigInteger.valueOf(5000000000L);
+    public static final BigInteger NULS_100 = BigInteger.valueOf(10000000000L);
+    public static final BigInteger NULS_200 = BigInteger.valueOf(20000000000L);
+    public static final BigInteger NULS_500 = BigInteger.valueOf(50000000000L);
+    public static final BigInteger NULS_1000 = BigInteger.valueOf(100000000000L);
 }
