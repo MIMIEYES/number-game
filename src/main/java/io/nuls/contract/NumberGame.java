@@ -253,9 +253,6 @@ public class NumberGame extends Ownable implements Contract {
         }
         BigDecimal availablePool = new BigDecimal(prizePool).multiply(BigDecimal.valueOf(100 - percent)).divide(BigDecimal.valueOf(100));
         BigInteger perPrize = availablePool.divide(BigDecimal.valueOf(size), 0, BigDecimal.ROUND_DOWN).toBigInteger();
-        if(perPrize.compareTo(NULS_18) > 0) {
-            return NULS_18;
-        }
         return perPrize;
     }
 
