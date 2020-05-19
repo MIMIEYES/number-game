@@ -16,10 +16,7 @@ import io.nuls.contract.sdk.annotation.View;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.nuls.contract.constant.Constant.*;
 import static io.nuls.contract.sdk.Utils.require;
@@ -32,6 +29,7 @@ public class NumberGame extends Ownable implements Contract {
     private Map<Long, Game> gameMap = new HashMap<Long, Game>();
     private Map<Long, Game> gameHistoryMap = new HashMap<Long, Game>();
     private int size;
+    private BigInteger publicBenefit;
     private BigInteger prizePool;
     private Game last;
     // 两局游戏之间隔的区块数量
@@ -49,6 +47,7 @@ public class NumberGame extends Ownable implements Contract {
         gameInterval = 10;
         gameHeightRange = 60;
         gameLotteryDelay = 5;
+        publicBenefit = BigInteger.ZERO;
         prizePool = BigInteger.ZERO;
     }
 
@@ -68,7 +67,8 @@ public class NumberGame extends Ownable implements Contract {
         Game game = gameMap.get(gameId);
         require(game != null, "游戏已结束或不存在");
         checkGame(game);
-        require(Msg.value().compareTo(Constant.MIN_AMOUNT) >= 0, "最低参与金额2.01NULS");
+        BigInteger senderValue = Msg.value();
+        require(senderValue.compareTo(Constant.MIN_AMOUNT) >= 0, "最低参与金额2.01NULS");
         Address sender = Msg.sender();
         Map<Integer, List<User>> participants = game.getParticipants();
         List<User> users;
@@ -84,10 +84,10 @@ public class NumberGame extends Ownable implements Contract {
                 participants.put(number, users);
             }
         }
-        users.add(new User(Msg.sender(), number, Msg.value()));
-        prizePool = prizePool.add(Constant.PARTICIPANTS_AMOUNT);
+        users.add(new User(Msg.sender(), number, senderValue));
+        prizePool = prizePool.add(PARTICIPANTS_AMOUNT);
+        publicBenefit = publicBenefit.add(senderValue.subtract(PARTICIPANTS_AMOUNT));
         Utils.emit(new ParticipantEvent(gameId, Msg.sender(), number));
-
     }
 
     /**
@@ -157,6 +157,39 @@ public class NumberGame extends Ownable implements Contract {
         this.gameLotteryDelay = gameLotteryDelay;
     }
 
+    public void receivePublicBenefit() {
+        onlyOwner();
+        require(publicBenefit.compareTo(NULS_0_dot_01) >= 0, "金额不足");
+        this.owner.transfer(publicBenefit);
+    }
+
+    /**
+     * 放弃一轮未开奖的游戏，归还参与金额
+     */
+    public void giveUpGame(Long id) {
+        onlyOwner();
+        Game game = gameMap.get(id);
+        require(game != null, "游戏已开奖或不存在");
+        Map<Integer, List<User>> participants = game.getParticipants();
+        int k = 0;
+        if(participants != null && participants.size() > 0) {
+            Collection<List<User>> lists = participants.values();
+            for(List<User> list : lists) {
+                for(User user : list) {
+                    user.getUser().transfer(PARTICIPANTS_AMOUNT);
+                    k++;
+                }
+            }
+        }
+        if(k >0) {
+            prizePool = prizePool.subtract(PARTICIPANTS_AMOUNT.multiply(BigInteger.valueOf(k)));
+        }
+        Utils.emit(new LotteryEvent(id, null, null, null));
+        // 结束游戏
+        gameMap.remove(id);
+        gameHistoryMap.put(id, game);
+
+    }
     @View
     public int getGameInterval() {
         return gameInterval;
@@ -175,6 +208,11 @@ public class NumberGame extends Ownable implements Contract {
     @View
     public String getPrizePool() {
         return prizePool.toString();
+    }
+
+    @View
+    public String getPublicBenefit() {
+        return publicBenefit.toString();
     }
 
     @View
@@ -263,6 +301,7 @@ public class NumberGame extends Ownable implements Contract {
         if (last == null) {
             start = currentHeight;
         } else {
+            require(last.getEndHeight() != null, "当前游戏还未结束");
             start = last.getEndHeight() + gameInterval;
             if (start < currentHeight) {
                 start = currentHeight;
