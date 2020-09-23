@@ -30,7 +30,8 @@ import java.math.BigInteger;
  * @date: 2020-04-07
  */
 public class Constant {
-    public static final BigInteger MIN_AMOUNT = BigInteger.valueOf(201000000L);
+    // 2.1 NULS
+    public static final BigInteger MIN_AMOUNT = BigInteger.valueOf(210000000L);
     public static final BigInteger NULS_0_dot_01 = BigInteger.valueOf(1000000L);
     public static final BigInteger PARTICIPANTS_AMOUNT = BigInteger.valueOf(200000000L);
     public static final BigInteger NULS_10 = BigInteger.valueOf(1000000000L);

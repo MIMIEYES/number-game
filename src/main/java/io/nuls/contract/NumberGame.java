@@ -68,7 +68,7 @@ public class NumberGame extends Ownable implements Contract {
         require(game != null, "游戏已结束或不存在");
         checkGame(game);
         BigInteger senderValue = Msg.value();
-        require(senderValue.compareTo(Constant.MIN_AMOUNT) >= 0, "最低参与金额2.01NULS");
+        require(senderValue.compareTo(Constant.MIN_AMOUNT) >= 0, "最低参与金额2.1NULS");
         Address sender = Msg.sender();
         Map<Integer, List<User>> participants = game.getParticipants();
         List<User> users;
@@ -162,6 +162,12 @@ public class NumberGame extends Ownable implements Contract {
         require(publicBenefit.compareTo(NULS_0_dot_01) >= 0, "金额不足");
         this.owner.transfer(publicBenefit);
     }
+
+    /*public void clear() {
+        onlyOwner();
+        require(Msg.address().balance().compareTo(NULS_0_dot_01) >= 0, "金额不足");
+        this.owner.transfer(Msg.address().balance());
+    }*/
 
     /**
      * 放弃一轮未开奖的游戏，归还参与金额
