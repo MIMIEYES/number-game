@@ -19,7 +19,7 @@ import static io.nuls.contract.constant.Constant.PARTICIPANTS_AMOUNT;
 import static io.nuls.contract.sdk.Utils.require;
 
 /**
- *
+ * 猜不中数字游戏
  * 一局最多十人参与
  * 每个号码不能被重复投注
  * 每人不可以加倍投注
@@ -237,7 +237,7 @@ public class NumberGame extends Ownable implements Contract {
         for (Map.Entry<Address, Integer> entry : entries) {
             _user = entry.getKey();
             _number = entry.getValue();
-            compensation = BigInteger.valueOf((((_number + lotteryNumber) % 9) + 1) * 100000000);
+            compensation = BigInteger.valueOf((((_number + lotteryNumber) % 9) + 1) * 200000000);
             list.add(new Compensation(_user.toString(), compensation));
             totalCompensation = totalCompensation.add(compensation);
             _user.transfer(PARTICIPANTS_AMOUNT.add(compensation));
